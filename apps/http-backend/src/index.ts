@@ -1,7 +1,7 @@
 import express from "express";
-import detenv from "dotenv"
+import dotenv from "dotenv"
 import jwt from "jsonwebtoken";
-detenv.config();
+dotenv.config();
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { Middleware } from "./middleware";
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/zodTypes";
@@ -108,5 +108,44 @@ app.post("/room", Middleware, async(req, res) => {
     })
  }
 });
+
+app.get("/chats/:roomId", async (req, res) => {
+    try {
+        const roomId = Number(req.params.roomId);
+        console.log(req.params.roomId);
+        const messages = await prismaClient.chat.findMany({
+            where: {
+                roomId: roomId
+            },
+            orderBy: {
+                id: "desc"
+            },
+            take: 1000
+        });
+
+        res.json({
+            messages
+        })
+    } catch(e) {
+        console.log(e);
+        res.json({
+            messages: []
+        })
+    }
+    
+})
+
+app.get("/room/:slug", async (req, res) => {
+    const slug = req.params.slug;
+    const room = await prismaClient.room.findFirst({
+        where: {
+            slug
+        }
+    });
+
+    res.json({
+        room
+    })
+})
 
 app.listen(3005);

@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "jsonwebtoken": "^9.0.3",
-    "ws": "^8.19.0"
+    "ws": "^8.19.0",
+    "@repo/db": "workspace:*"
   },
   "keywords": [],
   "author": "",
