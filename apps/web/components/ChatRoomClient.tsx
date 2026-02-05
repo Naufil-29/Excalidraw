@@ -17,7 +17,7 @@ export function ChatRoomClient({
 
     useEffect(() => {
         if (socket && !loading) {
-
+            alert("join_room message sent")
             socket.send(JSON.stringify({
                 type: "join_room",
                 roomId: id
@@ -37,7 +37,7 @@ export function ChatRoomClient({
 
         <input type="text" value={currentMessage} onChange={e => {
             setCurrentMessage(e.target.value);
-        }}></input>
+        }} className="border-2 rounded-xl w-50 h-10"></input>
         <button onClick={() => {
             socket?.send(JSON.stringify({
                 type: "chat",
@@ -46,6 +46,6 @@ export function ChatRoomClient({
             }))
 
             setCurrentMessage("");
-        }}>Send message</button>
+        }} className="border-2 rounded-xl bg-red-500 text-white hover:bg-red-800 w-50 h-10">Send message</button>
     </div>
 }
