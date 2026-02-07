@@ -20,6 +20,9 @@ importers:
 
   apps/excelidraw-project:
     dependencies:
+      axios:
+        specifier: ^1.13.4
+        version: 1.13.4
       lucide-react:
         specifier: ^0.563.0
         version: 0.563.0(react@19.2.3)
