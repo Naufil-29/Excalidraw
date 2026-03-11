@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import { JwtPayload } from "jsonwebtoken";
 import { JWT_SECRET } from "@repo/backend-common/config";
 import { prismaClient } from "@repo/db/client"
-const wss = new WebSocketServer({ port: 8080 });
+const wss = new WebSocketServer({ port: 8080 }, () => console.log("ws server running on port-8080"));
 
 interface User { 
     userId: string
@@ -30,8 +30,6 @@ function checkUser(token: string): string | null{
     catch(e){ 
         return null
     }
-
-    return null
 }
 
 wss.on('connection', function connection(ws, request){ 
@@ -97,5 +95,47 @@ wss.on('connection', function connection(ws, request){
                 }
             })
         }
+        if (parsedData.type === "delete_shape") {
+            const roomId = String(parsedData.roomId);
+            const shapeId = parsedData.shapeId;
+            await prismaClient.chat.create({
+                data: {
+                    roomId: Number(roomId),
+                    userId,
+                    message: JSON.stringify({ type: "delete", shapeId }),
+                },
+            });
+            users.forEach(user => {
+                if (user.rooms.includes(roomId)) {
+                    user.ws.send(JSON.stringify({ type: "delete_shape", roomId, shapeId }));
+                }
+            });
+        }
+        if (parsedData.type === "update_shape") {
+            const roomId = String(parsedData.roomId);
+            const shape = parsedData.shape;
+            await prismaClient.chat.create({
+                data: {
+                    roomId: Number(roomId),
+                    userId,
+                    message: JSON.stringify({ type: "update", shape }),
+                },
+            });
+            users.forEach(user => {
+                if (user.rooms.includes(roomId)) {
+                    user.ws.send(JSON.stringify({ type: "update_shape", roomId, shape }));
+                }
+            });
+        }
     });
-})
+});
+
+/*
+ * CHANGELOG (shape edit sync):
+ * - delete_shape: accepts { roomId, shapeId }, broadcasts to all clients in room so they remove the shape.
+ * - update_shape: accepts { roomId, shape }, broadcasts so clients update the shape (resize, color, text edit).
+ * CHANGELOG (permanent delete):
+ * - delete_shape now persists to DB: creates a Chat row with message = { type: "delete", shapeId }. Frontend replays add/delete when loading so deleted shapes stay gone after refresh.
+ * CHANGELOG (persist update / relocate):
+ * - update_shape now persists to DB: creates a Chat row with message = { type: "update", shape }. Frontend replays updates when loading so moved/resized shapes keep their position after refresh.
+ */

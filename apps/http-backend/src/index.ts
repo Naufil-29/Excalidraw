@@ -6,6 +6,7 @@ import { JWT_SECRET } from "@repo/backend-common/config";
 import { Middleware } from "./middleware";
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/zodTypes";
 import { prismaClient } from "@repo/db/client";
+const PORT = 3005;
 import cors from "cors"
 const app = express();
 app.use(express.json());
@@ -111,7 +112,7 @@ app.post("/room", Middleware, async(req, res) => {
  }
 });
 
-app.get("/chats/:roomId", async (req, res) => {
+app.get("/chats/:roomId", Middleware, async (req, res) => {
     try {
         const roomId = Number(req.params.roomId);
         console.log(req.params.roomId);
@@ -150,4 +151,6 @@ app.get("/room/:slug", async (req, res) => {
     })
 })
 
-app.listen(3005);
+app.listen(PORT, () => { 
+    console.log(`http-backend running on ${PORT}`)
+})
