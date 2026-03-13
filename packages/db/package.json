@@ -8,7 +8,7 @@
     "./client": "./dist/index.js"
   },
   "scripts": {
-    "build": "prisma generate && tsc",
+    "build": "prisma generate && tsc && tsc -p tsconfig.generated.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
