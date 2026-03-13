@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import jwt from "jsonwebtoken";
 dotenv.config();
 import { JWT_SECRET } from "@repo/backend-common/config";
-import { Middleware } from "./middleware";
+import { Middleware } from "./middleware.js";
 import { CreateUserSchema, SigninSchema, CreateRoomSchema } from "@repo/common/zodTypes";
 import { prismaClient } from "@repo/db/client";
 const PORT = 3005;
